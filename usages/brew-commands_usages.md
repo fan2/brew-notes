@@ -1,3 +1,5 @@
+[brew manual page (command documentation)](https://docs.brew.sh/Manpage)
+
 ## brew 命令
 
 ### commands
@@ -52,6 +54,17 @@ brew command [--verbose|-v] [options] [formula] ...
 
 `brew deps`
 
+```bash
+--tree
+Show dependencies as a tree. When given multiple formula arguments, show individual trees for each formula.
+
+--graph
+Show dependencies as a directed graph.
+
+--installed
+List dependencies for formulae that are currently installed. If formula is specified, list only its dependencies that are currently installed.
+```
+
 ### uses
 
 `brew uses`
@@ -84,6 +97,23 @@ If `−−installed` is passed, show options for all installed formulae.
 ### uninstall
 
 brew uninstall
+
+如果我们用 brew 安装了 python，后面升级没有清除旧版本，导致残留了很多旧版本。
+
+```bash
+$ ls -1 `brew --cellar` | grep 'python@'
+python@3.12
+python@3.13
+
+$ find `brew --cellar` -type d -iname "python@*"
+/opt/homebrew/Cellar/python@3.13
+/opt/homebrew/Cellar/python@3.12
+```
+
+如果已经不需要 Python 3.12 版本，可以执行 `brew uninstall python@3.12` 卸载该版本。
+当然，最好手动清除一下对应的 site-packages，可通过 `pip3 -V` 或 `pprint.pp(sys.path)` 查看路径，一般为 \`brew --cellar\`/../lib：
+
+> rm -rf \`brew --cellar\`/../lib/python3.12
 
 ## brew 列举已安装
 
@@ -198,26 +228,3 @@ Removing: /usr/local/Cellar/sqlite/3.25.2... (11 files, 3.7MB)
 
 某些软件在稳定版出来之前，建议暂时保留历史版本，以便 `brew switch` 切回旧版本。  
 故不要轻易执行 `brew cleanup`，建议先执行 `brew cleanup -n` 预览删除输出，以便取舍。  
-
-### prune
-
-`brew prune`：清除僵尸软链。
-
-执行 `brew help prune` 查看帮助：
-
-```Shell
-➜  ~  brew help prune
-Usage: brew prune [options]
-
-Remove dead symlinks from the Homebrew prefix. This is generally not
-needed, but can be useful when doing DIY installations.
-
-    -n, --dry-run                    Show what would be removed, but do not
-                                     actually remove anything.
-    -v, --verbose                    Make some output more verbose.
-    -d, --debug                      Display any debugging information.
-    -h, --help                       Show this message.
-```
-
-可先执行 `brew prune -n` 测试查看指令输出，再决定是否真的需要执行该命令。  
-执行命令时，可选择携带 `-v` 选项，查看更详细的 verbose 信息输出。  

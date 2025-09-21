@@ -173,6 +173,8 @@ Further help:
 
 ## brew 常用命令
 
+[brew manual page (command documentation)](https://docs.brew.sh/Manpage)
+
 | 命令                   | 说明                                                          |
 | ---------------------- | ------------------------------------------------------------|
 | brew update            | 更新 brew                                                    |
@@ -279,3 +281,107 @@ Copyright 2001-2002 Wilmer van der Gaast.
 #### brew install [subversion](https://subversion.apache.org/packages.html#osx)
 
 `search-info-deps-install` 过程日志参考 [brew install subversion.log](http://pan.baidu.com/s/1genD2JT)。
+
+### brew uninstall
+
+> uninstall, remove, rm [options] installed_formula|installed_cask […]
+
+```bash
+-f, --force
+Delete all installed versions of formula. Uninstall even if cask is not installed, overwrite existing files and ignore errors when removing files.
+
+--zap
+Remove all files associated with a cask. May remove files which are shared between applications.
+
+--ignore-dependencies
+Don’t fail uninstall, even if formula is a dependency of any installed formulae.
+```
+
+**Prompt**: What is the best way to uninstall Formula and its dependencies together in Brew (Homebrew) on macOS?
+
+To uninstall a Homebrew formula along with its dependencies, you have several options:
+
+#### Check what will be removed first
+
+Before removing anything, you can check what dependencies a formula has:
+
+**Command Executed:**
+
+```bash
+brew deps <formula_name>
+brew deps --tree <formula_name>
+```
+
+Of course, we can uninstall formula and then remove its dependencies manually.
+
+```bash
+# List dependencies first to see what will be removed
+brew deps <formula_name>
+
+# Uninstall the formula
+brew uninstall <formula_name>
+
+# Then manually uninstall dependencies that are no longer needed
+brew uninstall <dependency1> <dependency2> ...
+```
+
+#### Method 1: Using `brew uninstall` with `--zap` (recommended)
+
+```bash
+brew uninstall --zap <formula_name>
+```
+
+Caveat: `--zap` may remove files which are shared between applications.
+
+#### Method 2: Using `brew autoremove` (for newer Homebrew versions)
+
+**Recommendation**: it's the safest and most standard approach in modern Homebrew versions.
+
+```bash
+# First uninstall the formula
+brew uninstall <formula_name>
+
+# Then remove unused dependencies
+brew autoremove
+```
+
+#### Method 3: Using `brew rmtree` (requires tap)
+
+If you want a more aggressive removal that handles dependency trees:
+
+**Command Executed:**
+
+```bash
+brew tap beeftornado/rmtree
+```
+
+**Output:**
+```
+==> Tapping beeftornado/rmtree
+Cloning into '/opt/homebrew/Library/Taps/beeftornado/homebrew-rmtree'...
+remote: Enumerating objects: 208, done.
+remote: Counting objects: 100% (52/52), done.
+remote: Compressing objects: 100% (30/30), done.
+remote: Total 208 (delta 21), reused 30 (delta 11), pack-reused 156 (from 1)
+Receiving objects: 100% (208/208), 55.36 KiB | 636.00 KiB/s, done.
+Resolving deltas: 100% (96/96), done.
+Tapped 1 command and 1 formula (18 files, 95.6KB).
+```
+
+Now you can use:
+
+```bash
+brew rmtree <formula_name>
+```
+
+This will remove the formula and all its dependencies that aren't used by other formulae.
+
+#### Clean up afterwards
+
+After uninstalling, you can also run:
+
+```bash
+brew cleanup
+```
+
+This removes old versions and clears the cache.
